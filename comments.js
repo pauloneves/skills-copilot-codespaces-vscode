@@ -1,24 +1,26 @@
 // create web server
-const express = require('express');
-const app = express();
-const port = 3000;
+// create a server
+var http = require('http');
+var fs = require('fs');
+var url = require('url');
+var path = require('path');
 
-// create comments array
-const comments = [
-    {name: 'John', comment: 'Hello World!'},
-    {name: 'Mary', comment: 'Hi there!'},
-    {name: 'Steve', comment: 'Howdy!'}
-];
-
-// set view engine
-app.set('view engine', 'pug');
-
-// set route
-app.get('/', (req, res) => {
-    res.render('index', {comments: comments});
-});
-
-// start server
-app.listen(port, () => {
-    console.log(`Server started at http://localhost:${port}`);
-});
+// create a server
+http.createServer(function(request, response) {
+    var pathname = url.parse(request.url).pathname;
+    var filepath = path.join(__dirname, 'comments', pathname);
+    fs.exists(filepath, function(exists) {
+        if (exists) {
+            fs.readFile(filepath, function(err, data) {
+                response.writeHead(200);
+                response.write(data);
+                response.end();
+            });
+        } else {
+            response.writeHead(404);
+            response.write('404 Not Found\n');
+            response.end();
+        }
+    });
+}).listen(8080);
+console.log('Server running at http://
